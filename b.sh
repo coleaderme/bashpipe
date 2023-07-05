@@ -20,7 +20,6 @@ then
   exit
 fi
 
-echo "You've made it!"
 exit
 echo "[+] STAGE 1"
 ##~ Stage 1: site eXtract
