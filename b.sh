@@ -5,7 +5,7 @@
 # ***************************
 usage_func(){
   echo ''
-  echo -e "USAGE:\n  bash b.sh djsbuzz_url\n ./b.sh bash b.sh djsbuzz_url\n"
+  echo -e "USAGE:\n  bash b.sh djsbuzz_url\n ./b.sh djsbuzz_url\n"
   echo "show this message: -h, --help"
   echo ''
 }
@@ -20,10 +20,11 @@ then
   exit
 fi
 
-exit
+
 echo "[+] STAGE 1"
 ##~ Stage 1: site eXtract
-xh "https://www.djsbuzz.in/category/dj-nyk/" | htmlq --attribute href a | rg --only-matching "https://www.djsbuzz.in/[a-z0-9]+-[a-z0-9]+-[a-z0-9].*?/" | uniq - rawUrls.txt
+## xh -4 "https://www.djsbuzz.in/category/dj-nyk/" | htmlq --attribute href a | rg --only-matching "https://www.djsbuzz.in/[a-z0-9]+-[a-z0-9]+-[a-z0-9].*?/" | uniq - rawUrls.txt
+xh -4 "$1" | htmlq --attribute href a | rg --only-matching "https://www.djsbuzz.in/[a-z0-9]+-[a-z0-9]+-[a-z0-9].*?/" | uniq - rawUrls.txt
 
 wait
 
@@ -49,7 +50,7 @@ cust_func(){
   then
     # saving in file method:
     echo "[+] found mediafire.com url: Saved to real_MF_links.txt"
-    xh "$1" -p b | rg --only-matching "https://download.*?\"" >> real_MF_links.txt
+    xh "$1" -p b --pretty=none | rg --only-matching "https://download.*?\"" >> real_MF_links.txt
     
   else
     echo "[+] found hearthis.at url: downloading..."
@@ -70,9 +71,9 @@ echo ""
 echo "[**] Downloading real_MF_links.txt"
 aria2c --seed-time=0 --summary-interval 5 --user-agent=Mozilla/5.0 --file-allocation=falloc -c -j 6 -x 6 -s 6 -k 1M -i real_MF_links.txt
 echo "[+] All files are downloaded."
-echo "[+] Clean up:"
+echo "[+] Clean up.."
 mv pre_final.txt pre_final.txt.old 
 mv rawUrls.txt rawUrls.txt.old
 mv real_MF_links.txt real_MF_links.txt.old
-echo "[+] Exiting Gracefully"
+echo "[+] Exiting Gracefully."
 #=========================================================
