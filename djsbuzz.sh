@@ -9,6 +9,7 @@ usage_func(){
   echo "show this message: -h, --help"
   echo ''
 }
+
 if [[ $1 == '' || $1 == "--help" || $1 == "-h" ]]
 then
   usage_func
