@@ -7,6 +7,6 @@
     sudo pacman -S xh htmlq ripgrep
 ```
 
-**purpose**: download tracks from paticular page.
+**purpose**: download from internet.
 
-*Bash is amazing!*
+* *sh is amazing!*
