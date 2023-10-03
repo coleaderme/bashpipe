@@ -1,8 +1,29 @@
 #!/usr/bin/sh
-#
+# Pre-requisites:
+# xh, rg (ripgrep), htmlq, jq
+# easily available on arch linux.
+
 # Usage: ./jdl YOUR_LINK_HERE
 [ -z $1 ] && echo "USAGE:\n./jdl YOUR_LINK_HERE\n" && exit
 echo "[+] STARTED: `date +%s`"
+
+################## Timeout #####################
+wait_with_timeout() {
+    local timeout=$1
+    local start_time=$(date +%s)
+
+    # Wait for background processes
+    wait
+
+    local end_time=$(date +%s)
+    local elapsed_time=$((end_time - start_time))
+
+    # If the elapsed time exceeds the timeout, kill remaining background processes
+    if [ "$elapsed_time" -ge "$timeout" ]; then
+        echo "Timeout reached. Killing remaining background processes."
+        pkill -P $$  # Kill child processes
+    fi
+}
 ################### downloader ####################
 downloader(){
 ## expects token and title as input.
@@ -28,7 +49,7 @@ mkdir "$album"
 cd $album
 # $1 is album url
 items=$(xh "$1" | htmlq -a href a | rg  "/song")
-max_concurrent=4
+max_concurrent=5
 bg_counter=0
 
 for i in $items; do
@@ -38,10 +59,11 @@ for i in $items; do
     ## download in parallel //
     downloader "$token" "$title" &
     if [ "$bg_counter" -eq "$max_concurrent" ]; then
-        wait
+        wait_with_timeout 10
         bg_counter=0
     fi
 done
+wait_with_timeout 10
 }
 
 ################### single #####################
@@ -59,6 +81,7 @@ downloader "$token" "$title"
 case "$1" in
     *song*) track_dl "$1" ;;
     *album*) album_dl "$1" ;;
+    *featured*) album_dl "$1" ;;
     *) echo "[-] unable to identify :/" ;;
 esac
 echo "[+] FINISHED: `date +%s`" # shell is finished, download still going.
