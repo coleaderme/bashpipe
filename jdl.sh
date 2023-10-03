@@ -19,7 +19,7 @@ wget "$dl_url" -O $title.m4a
 echo "[+] [`date +%s`] Downloaded: $title.m4a"
 }
 
-################### album songs #################
+################### album/playlist songs #################
 ## Complete album dl:
 album_dl(){
 echo "[+] Identified: Album"
@@ -28,11 +28,19 @@ mkdir "$album"
 cd $album
 # $1 is album url
 items=$(xh "$1" | htmlq -a href a | rg  "/song")
+max_concurrent=4
+bg_counter=0
+
 for i in $items; do
+    bg_counter=$(($bg_counter + 1))
     title=$(echo "$i" | choose -f '/' -2)
     token=$(echo "$i" | choose -f '/' -1)
     ## download in parallel //
     downloader "$token" "$title" &
+    if [ "$bg_counter" -eq "$max_concurrent" ]; then
+        wait
+        bg_counter=0
+    fi
 done
 }
 
