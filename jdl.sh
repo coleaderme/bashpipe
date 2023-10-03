@@ -8,11 +8,9 @@ downloader(){
 token=$1
 title=$2
 input_url="https://www.jiosaavn.com/api.php?__call=webapi.get&token=$token&type=song&includeMetaTags=0&ctx=web6dot0&api_version=4&_format=json&_marker=0"
-echo "[+] [`date +%s`] Downloading json..."
+echo "[+] [`date +%s`] Downloading/Extracting json..."
 ## get encrypted URL
-xh -d --pretty=none --ignore-stdin "$input_url" "user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0" "cache-control:private, max-age=0, no-cache" -o "$token".json
-echo "[+] [`date +%s`] Extracting url..."
-enc_url=$(jq .songs[0].more_info.encrypted_media_url "$token".json)
+enc_url=$(xh --pretty=none --ignore-stdin "$input_url" "user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0" "cache-control:private, max-age=0, no-cache" | jq .songs[0].more_info.encrypted_media_url)
 echo $enc_url
 echo "[+] [`date +%s`] Decrypting url..."
 dl_url=$(python ../pyDes.py "$enc_url")
