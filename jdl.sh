@@ -36,7 +36,7 @@ enc_url=$(xh --pretty=none --ignore-stdin "$input_url" "user-agent:Mozilla/5.0 (
 echo "[+] [`date +%s`] Decrypting url"
 dl_url=$(python ../pyDes.py "$enc_url")
 echo "[+] [`date +%s`] Dowloading"
-wget "$dl_url" -O $title.m4a
+wget -q -c -w 1 --random-wait --save-cookies wcookies.txt --keep-session-cookies --header='user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0' --header='cache-control:private, max-age=0, no-cache' "$dl_url" -O $title.m4a
 echo "[+] [`date +%s`] Downloaded: $title.m4a"
 }
 
