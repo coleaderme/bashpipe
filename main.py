@@ -52,25 +52,3 @@ def Downloader(token,title):
 token = 'IQocRkUFdgQ'
 title = 'song'
 Downloader(token=token, title=title)
-
-
-''' trusted software sources.
-https://sanet.st/windows/
-https://w14.monkrus.ws/
-https://forum.dirtywarez.com/
-https://codec.kiev.ua/releases.html
-https://repack.me/
-https://audioz.download/
-https://nsaneforums.com/
-https://lrepacks.net/
-https://diakov.net/
-https://1progs.ru/
-https://www.teamos.xyz/
-https://cracksurl.com/
-https://rsload.net/
-https://www.board4all.biz/
-https://www.magesy.blog/
-https://appstorrent.ru/programs/
-https://www.torrentmac.net/
-https://nmac.to/
-'''
