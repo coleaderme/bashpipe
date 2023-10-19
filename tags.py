@@ -27,4 +27,3 @@ def addtags(filename, json_data):
     audio.save()
 
 addtags(filename,json_data)
-print(f"[+] {filename} Tagged!")

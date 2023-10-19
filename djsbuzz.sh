@@ -4,21 +4,21 @@
 # Downloader for djsbuzz.in
 # ***************************
 usage_func(){
-  echo ''
-  echo -e "USAGE:\n  bash b.sh djsbuzz_url\n ./b.sh djsbuzz_url\n"
-  echo "show this message: -h, --help"
-  echo ''
+    echo ''
+    echo -e "USAGE:\n  bash b.sh djsbuzz_url\n ./b.sh djsbuzz_url\n"
+    echo "show this message: -h, --help"
+    echo ''
 }
 
 if [[ $1 == '' || $1 == "--help" || $1 == "-h" ]]
 then
-  usage_func
-  exit
+    usage_func
+    exit
 elif [[ $1 != *"https://www.djsbuzz.in/"* ]]
 then
-  echo "[-] Only 'https://www.djsbuzz.in/*' urls are supported."
-  usage_func
-  exit
+    echo "[-] Only 'https://www.djsbuzz.in/*' urls are supported."
+    usage_func
+    exit
 fi
 
 
@@ -32,38 +32,38 @@ wait
 
 ##~ Stage 2: Look for hearthis OR mediafire type urls.
 rawExt_func(){
-  echo "+1"
-  xh -4 -p b "$1" | htmlq --attribute href a | rg --only-matching "https://(hearthis\.at/djsbuzz\.in/|www\.mediafire\.com/file).*" >> pre_final.txt
+    echo "+1"
+    xh -4 -p b "$1" | htmlq --attribute href a | rg --only-matching "https://(hearthis\.at/djsbuzz\.in/|www\.mediafire\.com/file).*" >> pre_final.txt
 }
 
 echo "[+] STAGE 2"
 echo "Adding to pre_final.txt"
 while IFS= read -r url
 do
-  rawExt_func "$url" &
+    rawExt_func "$url" &
 done < rawUrls.txt
 
 wait
 
 # Our custom download function
 cust_func(){
-  if [[ $1 == *"https://www.mediafire.com/file/"* ]]
-  then
-    # saving in file method:
-    echo "[+] found mediafire.com url: Saved to real_MF_links.txt"
-    xh "$1" -p b --pretty=none | rg --only-matching "https://download.*?\"" >> real_MF_links.txt
+    if [[ $1 == *"https://www.mediafire.com/file/"* ]]
+    then
+        # saving in file method:
+        echo "[+] found mediafire.com url: Saved to real_MF_links.txt"
+        xh "$1" -p b --pretty=none | rg --only-matching "https://download.*?\"" >> real_MF_links.txt
 
-  else
-    echo "[+] found hearthis.at url: downloading..."
-    xh -d -4 -p b --follow --pretty=none "$1"
-  fi
+    else
+        echo "[+] found hearthis.at url: downloading..."
+        xh -d -4 -p b --follow --pretty=none "$1"
+    fi
 }
 
 echo "[+] STAGE 3"
 ##~ Stage 3: Finally! it's download time.
 while IFS= read -r url
 do
-  cust_func "$url" &
+    cust_func "$url" &
 done < pre_final.txt
 
 wait
