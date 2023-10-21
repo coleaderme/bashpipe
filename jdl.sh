@@ -47,10 +47,8 @@ downloader(){
     echo "[+] [`date +%s`] Dowloading"
     wget -q -c -w 1 --random-wait --keep-session-cookies --save-cookies wcookies.txt --header='user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0' --header='cache-control:private, max-age=0, no-cache' "$dl_url" -O "$folder/$title.m4a"
     echo "[+] [`date +%s`] Downloaded: '$folder/$title.m4a'"
-
-    python tags.py "$folder/$title.m4a" "$token.json"
-    echo "[+] [`date +%s`] Tagged: '$folder/$title.m4a'"
-
+    ## tags song: adds metadata (background process)
+    python tags.py "$folder/$title.m4a" "$token.json" &
 }
 
 ################### album/playlist songs #################
