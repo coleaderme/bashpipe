@@ -19,11 +19,11 @@ def addtags(filename, json_data):
     audio['\xa9nam'] = html.unescape(str(json_data["songs"][0]["title"]))
     audio['\xa9ART'] = html.unescape(str(json_data["songs"][0]["more_info"]["artistMap"]["primary_artists"][0]["name"]))
     audio['\xa9alb'] = html.unescape(str(json_data["songs"][0]["more_info"]["album"]))
-    audio['aART'] = ", ".join([artist["name"] for artist in json_data["songs"][0]["more_info"]["artistMap"]["primary_artists"]])
-    audio['\xa9wrt'] = html.unescape(str(json_data["songs"][0]["more_info"]["music"]))
-    audio['desc'] = html.unescape(str("")) ## description is empty for now
-    audio['\xa9day'] = html.unescape(str(json_data["songs"][0]["year"]))
-    audio['cprt'] = html.unescape(str(json_data["songs"][0]["more_info"]["label"]))
+    # audio['aART'] = ", ".join([artist["name"] for artist in json_data["songs"][0]["more_info"]["artistMap"]["primary_artists"]]) ## album artists
+    # audio['\xa9wrt'] = html.unescape(str(json_data["songs"][0]["more_info"]["music"])) ## Composer
+    # audio['desc'] = html.unescape(str("")) ## description is empty for now
+    # audio['\xa9day'] = html.unescape(str(json_data["songs"][0]["year"]))
+    # audio['cprt'] = html.unescape(str(json_data["songs"][0]["more_info"]["label"])) ## copyright
     audio.save()
 
 addtags(filename,json_data)

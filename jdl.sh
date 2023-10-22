@@ -33,22 +33,30 @@ downloader(){
     folder=$3
     input_url="https://www.jiosaavn.com/api.php?__call=webapi.get&token=$token&type=song&includeMetaTags=0&ctx=web6dot0&api_version=4&_format=json&_marker=0"
     echo "[+] [`date +%s`] Downloading/Extracting json"
-    ## get encrypted URL
-    ## Orginal
-    # enc_url=$(xh --pretty=none --ignore-stdin "$input_url" "user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0" "cache-control:private, max-age=0, no-cache" | jq .songs[0].more_info.encrypted_media_url)
-    ## Beta | https://www.jiosaavn.com/song/apna-bana-le/ATIfejZ9bWw
+    
+    ## New version, supports tagging | https://www.jiosaavn.com/song/apna-bana-le/ATIfejZ9bWw
     # store json as $token.json in current folder.
+    
+    ## get encrypted URL
     xh --pretty=none --ignore-stdin "$input_url" "user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0" "cache-control:private, max-age=0, no-cache" >> "$token.json"
     enc_url=$(jq .songs[0].more_info.encrypted_media_url "$token.json")
+    
 
+    ## Metadata from json
+    song_title="$(jq .songs[0].title "$token.json")"
+    # year="$(jq .songs[0].year "$token.json")"
+    album="$(jq .songs[0].more_info.album "$token.json")"
+    album_artists="$(jq .songs[0].more_info.artistMap.primary_artists[].name "$token.json")"
+    
     echo "[+] [`date +%s`] Decrypting url"
     dl_url=$(python pyDes.py "$enc_url")
     ## store downloads in single or album name.
     echo "[+] [`date +%s`] Dowloading"
     wget -q -c -w 1 --random-wait --keep-session-cookies --save-cookies wcookies.txt --header='user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0' --header='cache-control:private, max-age=0, no-cache' "$dl_url" -O "$folder/$title.m4a"
     echo "[+] [`date +%s`] Downloaded: '$folder/$title.m4a'"
-    ## tags song: adds metadata (background process)
-    python tags.py "$folder/$title.m4a" "$token.json" &
+    ## tags song: adds metadata (in background)
+    ./tageditor set title="$song_title" album="$album" artist="$album_artists" --max-padding 429496729 --files "$folder/$title.m4a" &
+
 }
 
 ################### album/playlist songs #################
