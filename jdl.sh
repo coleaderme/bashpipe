@@ -55,8 +55,7 @@ downloader(){
     wget -q -c -w 1 --random-wait --keep-session-cookies --save-cookies wcookies.txt --header='user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0' --header='cache-control:private, max-age=0, no-cache' "$dl_url" -O "$folder/$title.m4a"
     echo "[+] [`date +%s`] Downloaded: '$folder/$title.m4a'"
     ## tags song: adds metadata (in background)
-    ./tageditor set title="$song_title" album="$album" artist="$album_artists" --max-padding 429496729 --files "$folder/$title.m4a" &
-
+    ./tageditor set title="$song_title" album="$album" artist="$album_artists" --max-padding 429496729 --files "$folder/$title.m4a"
 }
 
 ################### album/playlist songs #################
