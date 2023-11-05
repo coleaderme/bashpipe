@@ -1,19 +1,21 @@
 #!/usr/bin/env python
-ECB = 0
-CBC = 1
-PAD_NORMAL = 1
-PAD_PKCS5 = 2
+# These are constants
+# ECB = 0
+# CBC = 1
+# PAD_NORMAL = 1
+# PAD_PKCS5 = 2
+
 class _baseDes(object):
-    def __init__(self, mode=ECB, IV=None, pad=None, padmode=PAD_NORMAL):
+    def __init__(self, mode=0, IV=None, pad=None, padmode=1):
         if IV:
             IV = self._guardAgainstUnicode(IV)
         if pad:
             pad = self._guardAgainstUnicode(pad)
         self.block_size = 8
-        if pad and padmode == PAD_PKCS5:
-            raise ValueError("Cannot use a pad character with PAD_PKCS5")
+        if pad and padmode == 2:
+            print("Cannot use a pad character with PAD_PKCS5")
         if IV and len(IV) != self.block_size:
-            raise ValueError("Invalid Initial Value (IV), must be a multiple of " + str(self.block_size) + " bytes")
+            print("Invalid Initial Value (IV), must be a multiple of " + str(self.block_size) + " bytes")
         self._mode = mode
         self._iv = IV
         self._padding = pad
@@ -41,40 +43,40 @@ class _baseDes(object):
         return self._iv
     def setIV(self, IV):
         if not IV or len(IV) != self.block_size:
-            raise ValueError("Invalid Initial Value (IV), must be a multiple of " + str(self.block_size) + " bytes")
+            print("Invalid Initial Value (IV), must be a multiple of " + str(self.block_size) + " bytes")
         IV = self._guardAgainstUnicode(IV)
         self._iv = IV
     def _padData(self, data, pad, padmode):
         if padmode is None:
             padmode = self.getPadMode()
-        if pad and padmode == PAD_PKCS5:
-            raise ValueError("Cannot use a pad character with PAD_PKCS5")
-        if padmode == PAD_NORMAL:
+        if pad and padmode == 2:
+            print("Cannot use a pad character with PAD_PKCS5")
+        if padmode == 1:
             if len(data) % self.block_size == 0:
                 return data
             if not pad:
                 pad = self.getPadding()
             if not pad:
-                raise ValueError("Data must be a multiple of " + str(self.block_size) + " bytes in length. Use padmode=PAD_PKCS5 or set the pad character.")
+                print("Data must be a multiple of " + str(self.block_size) + " bytes in length. Use padmode=PAD_PKCS5 or set the pad character.")
             data += (self.block_size - (len(data) % self.block_size)) * pad
-        elif padmode == PAD_PKCS5:
+        elif padmode == 2:
             pad_len = 8 - (len(data) % self.block_size)
             data += bytes([pad_len] * pad_len)
         return data
     def _unpadData(self, data, pad, padmode):
         if not data:
             return data
-        if pad and padmode == PAD_PKCS5:
-            raise ValueError("Cannot use a pad character with PAD_PKCS5")
+        if pad and padmode == 2:
+            print("Cannot use a pad character with PAD_PKCS5")
         if padmode is None:
             padmode = self.getPadMode()
-        if padmode == PAD_NORMAL:
+        if padmode == 1:
             if not pad:
                 pad = self.getPadding()
             if pad:
                 data = data[:-self.block_size] + \
                        data[-self.block_size:].rstrip(pad)
-        elif padmode == PAD_PKCS5:
+        elif padmode == 2:
             pad_len = data[-1]
             data = data[:-pad_len]
         return data
@@ -84,7 +86,6 @@ class _baseDes(object):
                 return data.encode('ascii')
             except UnicodeEncodeError:
                 pass
-            raise ValueError("pyDes can only work with encoded strings, not Unicode.")
         return data
 class des(_baseDes):
     __pc1 = [56, 48, 40, 32, 24, 16,  8,
@@ -182,9 +183,7 @@ class des(_baseDes):
     ]
     ENCRYPT =   0x00
     DECRYPT =   0x01
-    def __init__(self, key, mode=ECB, IV=None, pad=None, padmode=PAD_NORMAL):
-        if len(key) != 8:
-            raise ValueError("Invalid DES key size. Key must be exactly 8 bytes long.")
+    def __init__(self, key, mode=0, IV=None, pad=None, padmode=1):
         _baseDes.__init__(self, mode, IV, pad, padmode)
         self.key_size = 8
         self.L = []
@@ -277,23 +276,16 @@ class des(_baseDes):
         if not data:
             return ''
         if len(data) % self.block_size != 0:
-            if crypt_type == des.DECRYPT: 
-                raise ValueError("Invalid data length, data must be a multiple of " + str(self.block_size) + " bytes\n.")
-            if not self.getPadding():
-                raise ValueError("Invalid data length, data must be a multiple of " + str(self.block_size) + " bytes\n. Try setting the optional padding character")
-            else:
-                data += (self.block_size - (len(data) % self.block_size)) * self.getPadding()
-        if self.getMode() == CBC:
+            data += (self.block_size - (len(data) % self.block_size)) * self.getPadding()
+        if self.getMode() == 1:
             if self.getIV():
                 iv = self.__String_to_BitList(self.getIV())
-            else:
-                raise ValueError("For CBC mode, you must supply the Initial Value (IV) for ciphering")
         i = 0
         dict = {}
         result = []
         while i < len(data):
             block = self.__String_to_BitList(data[i:i+8])
-            if self.getMode() == CBC:
+            if self.getMode() == 1:
                 if crypt_type == des.ENCRYPT:
                     block = list(map(lambda x, y: x ^ y, block, iv))
                 processed_block = self.__des_crypt(block, crypt_type)
@@ -320,7 +312,7 @@ class des(_baseDes):
         data = self.crypt(data, des.DECRYPT)
         return self._unpadData(data, pad, padmode)
 class triple_des(_baseDes):
-    def __init__(self, key, mode=ECB, IV=None, pad=None, padmode=PAD_NORMAL):
+    def __init__(self, key, mode=0, IV=None, pad=None, padmode=1):
         _baseDes.__init__(self, mode, IV, pad, padmode)
         self.setKey(key)
     def setKey(self, key):
@@ -329,12 +321,12 @@ class triple_des(_baseDes):
             if len(key) == 16: 
                 self.key_size = 16
             else:
-                raise ValueError("Invalid triple DES key size. Key must be either 16 or 24 bytes long")
-        if self.getMode() == CBC:
+                print("Invalid triple DES key size. Key must be either 16 or 24 bytes long")
+        if self.getMode() == 1:
             if not self.getIV():
                 self._iv = key[:self.block_size]
             if len(self.getIV()) != self.block_size:
-                raise ValueError("Invalid IV, must be 8 bytes in length")
+                print("Invalid IV, must be 8 bytes in length")
         self.__key1 = des(key[:8], self._mode, self._iv,
                   self._padding, self._padmode)
         self.__key2 = des(key[8:16], self._mode, self._iv,
@@ -368,7 +360,7 @@ class triple_des(_baseDes):
         if pad is not None:
             pad = self._guardAgainstUnicode(pad)
         data = self._padData(data, pad, padmode)
-        if self.getMode() == CBC:
+        if self.getMode() == 1:
             self.__key1.setIV(self.getIV())
             self.__key2.setIV(self.getIV())
             self.__key3.setIV(self.getIV())
@@ -394,7 +386,7 @@ class triple_des(_baseDes):
         data = self._guardAgainstUnicode(data)
         if pad is not None:
             pad = self._guardAgainstUnicode(pad)
-        if self.getMode() == CBC:
+        if self.getMode() == 1:
             self.__key1.setIV(self.getIV())
             self.__key2.setIV(self.getIV())
             self.__key3.setIV(self.getIV())
@@ -419,9 +411,9 @@ class triple_des(_baseDes):
 # enc_url="iPPGVzyogeiPwpro65A0eUaQggN+8+J4b3UyYFCRBhtSY4W7y3BKLsFRFJbEPiiKYUGylvXp8JUeHIADGZNfIoPzFaL/aK97"
 from sys import argv
 import base64
-des_cipher = des(b"38346591", ECB, b"\0\0\0\0\0\0\0\0", pad=None, padmode=PAD_PKCS5)
+des_cipher = des(b"38346591", 0, b"\0\0\0\0\0\0\0\0", pad=None, padmode=2)
 enc_url = argv[1]
 enc_url = base64.b64decode(enc_url.strip())
-dec_url = des_cipher.decrypt(enc_url, padmode=PAD_PKCS5).decode('utf-8')
+dec_url = des_cipher.decrypt(enc_url, padmode=2).decode('utf-8')
 dec_url = dec_url.replace('_96.mp4', '_320.mp4')
 print(dec_url)
