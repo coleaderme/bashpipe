@@ -10,7 +10,7 @@ class _baseDes(object):
         if pad:
             pad = self._guardAgainstUnicode(pad)
         self.block_size = 8
-        if pad and padmode == PAD _PKCS5:
+        if pad and padmode == PAD_PKCS5:
             raise ValueError("Cannot use a pad character with PAD_PKCS5")
         if IV and len(IV) != self.block_size:
             raise ValueError("Invalid Initial Value (IV), must be a multiple of " + str(self.block_size) + " bytes")
