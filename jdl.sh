@@ -39,13 +39,13 @@ downloader(){
     
     ## get encrypted URL from json directly without saving to file.
     enc_url=$(xh --session=Session -p b --pretty=none --ignore-stdin "$input_url" "user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0" "cache-control:private, max-age=0, no-cache" | jq .songs[0].more_info.encrypted_media_url)
-        
+    # echo "$enc_url" >> encrypted.txt        
     echo "[+] [`date +%s`] Decrypting url"
     dl_url=$(python pyDes.py "$enc_url")
     
     ## store downloads in single or album name.
     echo "[+] [`date +%s`] Dowloading"
-    wget -q -c -w 1 --random-wait --keep-session-cookies --header='user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0' --header='cache-control:private, max-age=0, no-cache' "$dl_url" -O "$folder/$title.m4a"
+    wget -q -c -w 1 --random-wait --keep-session-cookies --timeout=30 --header='user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0' --header='cache-control:private, max-age=0, no-cache' "$dl_url" -O "$folder/$title.m4a"
     echo "[+] [`date +%s`] Downloaded: '$folder/$title.m4a'"
 }
 
@@ -67,11 +67,11 @@ album_dl(){
         ## download in parallel //
         downloader "$token" "$title" "$album" &
         if [ "$bg_counter" -eq "$max_concurrent" ]; then
-            wait_with_timeout 10
+            wait_with_timeout 30
             bg_counter=0
         fi
     done
-    wait_with_timeout 10
+    wait_with_timeout 30
 }
 
 ################ from file ####################
