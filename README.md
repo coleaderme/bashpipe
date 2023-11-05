@@ -4,7 +4,7 @@
 
 **programs 🦀 used:**
 ```
-    sudo pacman -S xh htmlq ripgrep
+sudo pacman -S xh htmlq ripgrep
 ```
 
 **purpose**: download from internet.
