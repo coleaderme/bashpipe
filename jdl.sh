@@ -41,7 +41,8 @@ downloader(){
     enc_url=$(xh --session=Session -p b --pretty=none --ignore-stdin "$input_url" "user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0" "cache-control:private, max-age=0, no-cache" | jq .songs[0].more_info.encrypted_media_url)
     # echo "$enc_url" >> encrypted.txt        
     echo "[+] [`date +%s`] Decrypting url"
-    dl_url=$(python pyDes.py "$enc_url")
+    # dl_url=$(python pyDes.py "$enc_url")
+    dl_url=$(python __pycache__/pyDes.cpython-311.pyc "$enc_url")
     
     ## store downloads in single or album name.
     echo "[+] [`date +%s`] Dowloading"
