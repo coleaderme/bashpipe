@@ -84,15 +84,19 @@ from_file(){
     # read line and store as variable $url.
     while IFS= read -r url
     do
+        
         bg_counter=$(($bg_counter + 1))
+
         title=$(echo "$url" | choose -f '/' -2)
         token=$(echo "$url" | choose -f '/' -1)
         # save in custom_dls folder.
+        
         downloader "$token" "$title" "custom_dls" &
         if [ "$bg_counter" -eq "$max_concurrent" ]; then
             wait_with_timeout 10
             bg_counter=0
         fi
+
     done < $1 # <- input.txt containing urls.
     wait_with_timeout 10
 }

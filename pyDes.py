@@ -411,9 +411,13 @@ class triple_des(_baseDes):
 # enc_url="iPPGVzyogeiPwpro65A0eUaQggN+8+J4b3UyYFCRBhtSY4W7y3BKLsFRFJbEPiiKYUGylvXp8JUeHIADGZNfIoPzFaL/aK97"
 from sys import argv
 import base64
-des_cipher = des(b"38346591", 0, b"\0\0\0\0\0\0\0\0", pad=None, padmode=2)
-enc_url = argv[1]
-enc_url = base64.b64decode(enc_url.strip())
-dec_url = des_cipher.decrypt(enc_url, padmode=2).decode('utf-8')
-dec_url = dec_url.replace('_96.mp4', '_320.mp4')
-print(dec_url)
+
+def main():
+    des_cipher = des(b"38346591", 0, b"\0\0\0\0\0\0\0\0", pad=None, padmode=2)
+    enc_url = argv[1]
+    enc_url = base64.b64decode(enc_url.strip())
+    dec_url = des_cipher.decrypt(enc_url, padmode=2).decode('utf-8')
+    dec_url = dec_url.replace('_96.mp4', '_320.mp4')
+    print(dec_url)
+
+main()
