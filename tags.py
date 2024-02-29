@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# tagger for jiosaavan music
 # usage:
 # python tags.py simba.m4a data.json
 
@@ -14,11 +15,18 @@ with open(json_input) as j_file:
     for j in j_file:
         json_data = json.loads(j)
 
+
 def addtags(filename, json_data):
     audio = MP4(filename)
-    audio['\xa9nam'] = html.unescape(str(json_data["songs"][0]["title"]))
-    audio['\xa9ART'] = html.unescape(str(json_data["songs"][0]["more_info"]["artistMap"]["primary_artists"][0]["name"]))
-    audio['\xa9alb'] = html.unescape(str(json_data["songs"][0]["more_info"]["album"]))
+    audio["\xa9nam"] = html.unescape(str(json_data["songs"][0]["title"]))
+    audio["\xa9ART"] = html.unescape(
+        str(
+            json_data["songs"][0]["more_info"]["artistMap"]["primary_artists"][0][
+                "name"
+            ]
+        )
+    )
+    audio["\xa9alb"] = html.unescape(str(json_data["songs"][0]["more_info"]["album"]))
     # audio['aART'] = ", ".join([artist["name"] for artist in json_data["songs"][0]["more_info"]["artistMap"]["primary_artists"]]) ## album artists
     # audio['\xa9wrt'] = html.unescape(str(json_data["songs"][0]["more_info"]["music"])) ## Composer
     # audio['desc'] = html.unescape(str("")) ## description is empty for now
@@ -26,4 +34,5 @@ def addtags(filename, json_data):
     # audio['cprt'] = html.unescape(str(json_data["songs"][0]["more_info"]["label"])) ## copyright
     audio.save()
 
-addtags(filename,json_data)
+
+addtags(filename, json_data)
