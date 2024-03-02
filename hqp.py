@@ -166,37 +166,40 @@ def valid_urls()->list[str]:
     return urlsCollection
 
 def main():
-    urls = valid_urls()
-    if not urls:
+    urlsCollection = valid_urls()
+    if not urlsCollection:
         return False
     with httpx.Client(headers=headers, timeout=30) as client:
-        url="https://hqporner.com/hdporn/96783-you_dont_know_how_amazing_my_stepdaughter_ass_is.html"
-        info = fetch(url, client)
-        if info:
-            player_url = info['url']
-            directUrl = player_js(player_url, client)
-        if directUrl:
-            title = info['title']
-            casting = info['casting']
-            filename = (title + "-" + casting).replace(" ", "_") + ".mp4"
-            with open("log.txt", "a") as log:
-                log.write(f"input url: {url}\n")
-                log.write(f"player url: {player_url}\n")
-                log.write(f"title: {title}\n")
-                log.write(f"casts: {casting}\n")
-                log.write(f"filename: {filename}\n")
-                log.write(f"direct url: {directUrl}\n")
-                log.write("==================================\n")
-            run(
-            [
-                "aria2c",
-                "--header=User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-                "--header=Referer: https://mydaddy.cc/",
-                directUrl,
-                "-o",
-                filename
-            ]
-            )
+        for url in urlsCollection
+            info = fetch(url, client)
+            if info:
+                player_url = info['url']
+                directUrl = player_js(player_url, client)
+            if directUrl:
+                title = info['title']
+                casting = info['casting']
+                filename = (title + "-" + casting).replace(" ", "_") + ".mp4"
+                with open("log.txt", "a") as log:
+                    log.write(f"input url: {url}\n")
+                    log.write(f"player url: {player_url}\n")
+                    log.write(f"title: {title}\n")
+                    log.write(f"casts: {casting}\n")
+                    log.write(f"filename: {filename}\n")
+                    log.write(f"direct url: {directUrl}\n")
+                    log.write("==================================\n")
+                print('Saved +')
+                print('run this command>>')
+                print(f'aria2c --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" --header="Referer: https://mydaddy.cc/" {directUrl} -o {filename}')
+                # run(
+                # [
+                #     "aria2c",
+                #     "--header=User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+                #     "--header=Referer: https://mydaddy.cc/",
+                #     directUrl,
+                #     "-o",
+                #     filename
+                # ]
+                # )
 
 if __name__ == "__main__":
     main()
