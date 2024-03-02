@@ -171,7 +171,7 @@ def main():
         print('hqp.py URL URL...')
         return False
     with httpx.Client(headers=headers, timeout=30) as client:
-        for url in urlsCollection
+        for url in urlsCollection:
             info = fetch(url, client)
             if info:
                 player_url = info['url']
