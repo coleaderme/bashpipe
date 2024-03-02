@@ -11,8 +11,7 @@ import re
 
 res = "360"  ## change here resolution [360,720,1080]
 
-
-def getPage(pUrl, res):
+def getPage(pUrl: str, res: str):
     headers = {
         "Referer": "https://hqporner.com/?q=a",
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
@@ -42,7 +41,7 @@ def getPage(pUrl, res):
                 if "featuring" in i.text:
                     casting = i.text.strip()
                     print("[+] " + casting)
-            except:
+            except:  # noqa: E722
                 pass
 
         ## url re-construction from player.js
@@ -57,7 +56,7 @@ def getPage(pUrl, res):
             try:
                 v = re.search(p, s.text).group()
                 print(f"[+] found{v}")
-            except:
+            except:  # noqa: E722
                 pass
 
         directUrl = "https:" + v + "/" + res + ".mp4"
@@ -73,18 +72,35 @@ def getPage(pUrl, res):
             log.write(f"direct url: {directUrl}\n")
             log.write("==================================\n")
 
-        run(["aria2c", directUrl, "-o", filename])
+        run(
+            [
+                "aria2c",
+                "--header=User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+                "--header=Referer: https://mydaddy.cc/",
+                "-o",
+                filename,
+            ]
+        )
 
 
-## main starts here ##
-urlsCollection = []
-for url in argv[1:]:
-    if ("hqporner" in url) and ("https://" in url) and (".html" in url):
-        print("Getting: " + url)
-        urlsCollection.append(url)
-    else:
-        print(":: Invalid url: " + url)
+def main():
+    urlsCollection = []
+    for url in argv[1:]:
+        if (
+            (url.startswith("https://"))
+            and ("hqporner" in url)
+            and url.endswith(".html")
+        ):
+            print("Getting:: " + url)
+            print("resolution: " + res)
+            urlsCollection.append(url)
+        else:
+            print("Invalid url:: " + url)
 
-if urlsCollection:
-    for url in urlsCollection:
-        getPage(url, res)
+    if urlsCollection:
+        for url in urlsCollection:
+            getPage(url, res)
+
+
+if __name__ == "__main__":
+    main()
