@@ -168,6 +168,7 @@ def valid_urls()->list[str]:
 def main():
     urlsCollection = valid_urls()
     if not urlsCollection:
+        print('hqp.py URL URL...')
         return False
     with httpx.Client(headers=headers, timeout=30) as client:
         for url in urlsCollection
