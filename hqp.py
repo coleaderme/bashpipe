@@ -179,7 +179,7 @@ def main():
             if directUrl:
                 title = info['title']
                 casting = info['casting']
-                filename = (title + "-" + casting).replace(" ", "_") + ".mp4"
+                filename = (title + "-" + casting).replace(" ", "_").replace("'","_") + ".mp4"
                 with open("log.txt", "a") as log:
                     log.write(f"input url: {url}\n")
                     log.write(f"player url: {player_url}\n")
@@ -188,9 +188,8 @@ def main():
                     log.write(f"filename: {filename}\n")
                     log.write(f"direct url: {directUrl}\n")
                     log.write("==================================\n")
-                print('Saved +')
                 print('run this command>>')
-                print(f'aria2c --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" --header="Referer: https://mydaddy.cc/" {directUrl} -o {filename}')
+                print(f'aria2c --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" --header="Referer: https://mydaddy.cc/" {directUrl} -o "{filename}"')
                 # run(
                 # [
                 #     "aria2c",
