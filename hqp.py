@@ -112,7 +112,7 @@ def fetch(url: str, client: httpx.Client)-> dict or bool:
         print("[-] Unable to reach: "+ url+ "\n- check your connection\n- use wireguard/vpn/proxy.")
         return False
     doc = HTMLParser(html=r.content, detect_encoding=True)
-    
+
     video_page_url = "https:" + doc.css_first("iframe").attributes['src']
     print("[+] " + video_page_url)
     title = doc.css_first("title").text().replace(" - HQporner.com", "")
@@ -180,6 +180,7 @@ def main():
                 title = info['title']
                 casting = info['casting']
                 filename = (title + "-" + casting).replace(" ", "_").replace("'","_") + ".mp4"
+                command = f'aria2c --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" --header="Referer: https://mydaddy.cc/" {directUrl} -o "{filename}"')
                 with open("log.txt", "a") as log:
                     log.write(f"input url: {url}\n")
                     log.write(f"player url: {player_url}\n")
@@ -187,19 +188,10 @@ def main():
                     log.write(f"casts: {casting}\n")
                     log.write(f"filename: {filename}\n")
                     log.write(f"direct url: {directUrl}\n")
+                    log.write(command+"\n")
                     log.write("==================================\n")
-                print('run this command>>')
-                print(f'aria2c --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" --header="Referer: https://mydaddy.cc/" {directUrl} -o "{filename}"')
-                # run(
-                # [
-                #     "aria2c",
-                #     "--header=User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-                #     "--header=Referer: https://mydaddy.cc/",
-                #     directUrl,
-                #     "-o",
-                #     filename
-                # ]
-                # )
+                print('run this command >>')
+                print(command)
 
 if __name__ == "__main__":
     main()
