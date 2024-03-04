@@ -180,7 +180,7 @@ def main():
                 title = info['title']
                 casting = info['casting']
                 filename = (title + "-" + casting).replace(" ", "_").replace("'","_") + ".mp4"
-                command = f'aria2c --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" --header="Referer: https://mydaddy.cc/" {directUrl} -o "{filename}"')
+                command = f'aria2c --disable-ipv6=true --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" --header="Referer: https://mydaddy.cc/" {directUrl} -o "{filename}"'
                 with open("log.txt", "a") as log:
                     log.write(f"input url: {url}\n")
                     log.write(f"player url: {player_url}\n")

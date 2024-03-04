@@ -1,101 +1,77 @@
 #!/usr/bin/env sh
 # downloader for hqp0rn3r dot com
 #
-# Pre-requisites:
-# sudo pacman -S aria2c htmlq ripgrep sd 
-# 
-
+# Required: xh + aria2c 
+# works on termux: pkg install xh aria2
+#
 helper(){
     printf "USAGE:\n"
-    printf "./hqs url <res>  <- default: 360"
+    printf "./hqp URL Res  [default: 360]\n"
     exit
 }
 
 Download(){
-    ## input : videoUrl, filename, res (default: 360)
-    
-    ## HTML NAME
-    f="$(printf "$1" | cut -d "/" -f5)"
+    ## input : url, res (default: 360)
+    res="$2"
+
+    ## Name from URL
+    f="$(echo "$1" | cut -d "/" -f5 | cut -d "." -f1)"
+
     printf "[+] Getting: $1\n"
-    printf "[+] Downloading: $2\n"
-    printf "[+] Resoultion: $3\n"
-
-    ## GET HTML (another one)
-    aria2c -q --disable-ipv6=true --auto-file-renaming=false --console-log-level=warn --disk-cache=64M --show-console-readout=false --check-certificate=false --file-allocation=none -k 1M "$1" -o "$f.html"
-
-    ## FINDING REGEX
-    r=$(cat "$f.html" | rg --only-matching "replaceAll\(\"nrpuv\",+\w+\+\"pubs\/\"\+\w+")
-
-    ## CDN
-    r1="$(printf "$r" | choose -f ',' 1 | choose -f '\+' 0)"
-    [ -z "$r1" ] && printf "[-] r1 not found\n" && exit || printf "[+] r1: $r1\n"
-    cdnRegx="$(cat "$f.html" | rg --only-matching "$r1=\"\/\/+\w+" | sd "$r1=\"" "")"
-
-    ## URI
-    r2="$(printf "$r" | choose -f ',' 1 | choose -f '\+' 2)"
-    [ -z "$r2" ] && printf "[-] r2 not found\n" && exit || printf "[+] r2: $r2\n"
-    cdnRegx2="$(cat "$f.html" | rg --only-matching "$r2=\"\w+.\w+" | sd "$r2=\"" "")"
-
-    ## Complete url
-    url="https:$cdnRegx.bigcdn.cc/pubs/$cdnRegx2/$res.mp4"
-    printf "[+] direct url: $url\n"
+    printf "[+] Resoultion: $2\n"
     
-    ## Download..
-    aria2c --no-conf -c -x 8 -j 8 -s 8 -k 2M \
+    printf "Getting: $1\n" >> log.txt
+    printf "Resoultion: $2\n" >> log.txt
+
+    printf "Getting HTML..\n"
+    html="$(xh -F -I -4 --verify=no --timeout=30 --session=hqp --pretty=none "$1" "Referer: https://hqporner.com/?q=asd" "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36")"
+    
+    ## Extract player url and casting.
+    # rg: -m no. of matches
+    printf "[+] Title: $f\n"
+    player_url="https://$(echo "$html" | grep -m 1 -o -P "mydaddy\.cc\/video/\w+/")"
+    printf "[+] Player Url: $player_url\n"
+    casting="$(echo "$html" | grep -o -P "fa-star-o\">featuring <a href=\"\/actress\/[a-z-]+" | cut -d '/' -f3)"
+    printf "[+] Featuring: $casting\n"
+    
+
+    printf "Player Url: $player_url\n" >> log.txt
+    printf "Title: $f\n" >> log.txt
+    printf "Featuring: $casting\n" >> log.txt    
+
+    ## Player js html
+    ## Get first line: sed "1p;d" 
+    url="https:$(xh -F -I -4 --verify=no --timeout=30 --session=hqp --pretty=none "$player_url" "Referer: https://hqporner.com/?q=asd" "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" | grep -m 1 -o -P "\/\/+\w+\.bigcdn\.cc\/pubs\/\w+\.\w+" | sed "1p;d")/$res.mp4"
+    
+    printf "[+] Direct url: $url\n"
+    printf "Check out log.txt"
+    printf "Direct url: $url\n" >> log.txt
+    printf "run command >>\n" >> log.txt
+    printf "aria2c --allow-piece-length-change=true --disable-ipv6=true --header=\"Referer: https://mydaddy.cc/\" --header=\"User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36\" \"$url\" -o \"$f.mp4\"\n" >> log.txt
+    echo "=============================================================================" >> log.txt
+    
+    ## Download
+    aria2c \
     --allow-piece-length-change=true \
-    --auto-file-renaming=false \
-    --check-certificate=false \
     --console-log-level=warn \
     --disable-ipv6=true \
-    --disk-cache=64M \
-    --file-allocation=falloc \
-    --header="Accept: */*" \
     --header="Referer: https://mydaddy.cc/" \
     --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" \
-    "$url" -o "$2.mp4"
-}
+    "$url" -o "$f.mp4"
 
-Extract(){
-    ## input: url, res
-
-    ## GET HTML
-    htmlFile="$(printf "$1" | cut -d "-" -f 2)"
-    aria2c -q --no-conf \
-    --allow-piece-length-change=true \
-    --auto-file-renaming=false \
-    --check-certificate=false \
-    --console-log-level=warn \
-    --disable-ipv6=true \
-    --disk-cache=64M \
-    --file-allocation=none \
-    --show-console-readout=false \
-    --header="Accept: */*" \
-    --header="Referer: https://mydaddy.cc/" \
-    --header="User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" \
-    "$1" -o "$htmlFile"
-
-    ## INFO
-    vPage=$(htmlq -f "$htmlFile" "iframe" | rg --only-matching "video/+\w+/")
-    [ -z "$vPage" ] && printf "[-] Unable to extract videoUrl\n" && exit || printf "[+] Extracted videoUrl: https://mydaddy.cc/$vPage\n"
-    videoUrl="https://mydaddy.cc/$vPage"
-    casting=$(htmlq -t -f "$htmlFile" "header" ".fa-star-o" | sd ' ' '_')
-    filename="$(printf "$htmlFile" | cut -d "." -f 1)_$casting"
-    printf "[+] Got: '$htmlFile'\n"
-    
-    Download "$videoUrl" "$filename" "$res"
 }
 
 ### Starts Here ###
-[ -z "$2" ]
+
 case "$2" in
     360) res="$2" ;;
     720) res="$2" ;;
     1080) res="$2" ;;
     *) res="360" ;;
 esac
-    
+
 [ -z "$1" ] && helper
 case "$1" in
-    *hqporner*) Extract "$1" "$res" ;;
+    *hqporner*) Download "$1" "$res";;
     *) printf "[-] Invalid url\n" && exit ;;
 esac
