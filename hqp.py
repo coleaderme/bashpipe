@@ -63,7 +63,7 @@ def getPage(pUrl: str, res: str):
 
         directUrl = "https:" + v + "/" + res + ".mp4"
         print(directUrl)
-        filename = (title + "-" + casting).replace(" ", "_") + ".mp4"
+        filename = (title + "-" + casting).replace(" ", "_").replace("'","_").replace(",","_") + ".mp4"
 
         with open("log.txt", "a") as log:
             log.write(f"input url: {pUrl}\n")
