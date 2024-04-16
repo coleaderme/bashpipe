@@ -1,12 +1,13 @@
 #!/usr/bin/env sh
 # downloader for hqp0rn3r dot com
 #
-# Required: xh + aria2c 
-# works on termux: pkg install xh aria2
-#
+# Required: xh aria2c
+# via termux: pkg install xh aria2
+
 helper(){
     printf "USAGE:\n"
-    printf "./hqp URL Res  [default: 360]\n"
+    printf "sh hqp.sh URL res\n"
+    printf " ./hqp.sh URL res  [default: (360), 720, 1080]\n"
     exit
 }
 
@@ -40,7 +41,8 @@ Download(){
     printf "Featuring: $casting\n" >> log.txt    
 
     ## Player js html
-    ## Get first line: sed "1p;d" 
+    ## Get first line :: sed "1p;d"
+    ## header: referer is a must!
     url="https:$(xh -F -I -4 --verify=no --timeout=30 --session=hqp --pretty=none "$player_url" "Referer: https://hqporner.com/?q=asd" "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" | grep -m 1 -o -P "\/\/+\w+\.bigcdn\.cc\/pubs\/\w+\.\w+" | sed "1p;d")/$res.mp4"
     
     printf "[+] Direct url: $url\n"
@@ -61,7 +63,7 @@ Download(){
 
 }
 
-### Starts Here ###
+### Main Starts Here ###
 
 case "$2" in
     360) res="$2" ;;
